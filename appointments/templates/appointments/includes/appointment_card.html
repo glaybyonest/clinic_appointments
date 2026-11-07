@@ -1,0 +1,44 @@
+<article class="appointment-card" data-status="{{ appointment.status }}">
+    <div class="card-top">
+        <span class="badge badge-visit-type">{{ appointment.visit_type|upper }}</span>
+
+        {% if appointment.status == 'запланирован' %}
+            <span class="status-badge status-planned">Запись открыта</span>
+        {% elif appointment.status == 'идёт' %}
+            <span class="status-badge status-active">Приём идёт</span>
+        {% elif appointment.status == 'завершён' %}
+            <span class="status-badge status-completed">Приём окончен</span>
+        {% else %}
+            <span class="status-badge">{{ appointment.status }}</span>
+        {% endif %}
+    </div>
+
+    <h2 class="card-title" title="{{ appointment.title }}">
+        <a href="{% url 'appointments:appointment_detail' slug=appointment.slug %}">
+            {{ appointment.title|truncatechars:30 }}
+        </a>
+    </h2>
+
+    <ul class="card-meta">
+        <li><strong>Полное название:</strong> {{ appointment.title }}</li>
+        <li><strong>Дата приёма:</strong> {{ appointment.visit_date|date:"d.m.Y" }}</li>
+        <li><strong>Продолжительность:</strong> {{ appointment.duration }} мин.</li>
+        <li><strong>Количество пациентов:</strong> {{ appointment.patients }} чел.</li>
+        <li><strong>Кабинет:</strong> {{ appointment.cabin_name|default:"Кабинет не указан" }}</li>
+    </ul>
+
+    <div class="card-extra" id="extra-{{ appointment.id }}" hidden>
+        <p><strong>Код URL (slug):</strong> <code>{{ appointment.slug }}</code></p>
+        <p><strong>Время в расписании:</strong> {{ appointment.visit_date|date:"d.m.Y H:i" }}</p>
+        <p><strong>Профиль кабинета:</strong> {{ appointment.cabin_type|default:"Не назначен" }} (вместимость: {{ appointment.cabin_capacity|default:"—" }})</p>
+    </div>
+
+    <div class="card-actions">
+        <a href="{% url 'appointments:appointment_detail' slug=appointment.slug %}" class="btn btn-primary btn-sm">
+            Подробнее о приёме
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm js-toggle-extra" data-target="extra-{{ appointment.id }}">
+            Краткая сводка
+        </button>
+    </div>
+</article>

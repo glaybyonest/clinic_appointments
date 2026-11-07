@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — {{ app_title }}{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <h1 class="page-title">{{ app_title }}</h1>
+    <p class="lead-text">{{ app_description }}</p>
+
+    <div class="stats-banner">
+        <div class="stat-metric">
+            <span class="stat-label">Всего приёмов в базе данных (фильтр <code>|length</code>):</span>
+            <strong class="stat-value">Всего приёмов: {{ appointments|length }}.</strong>
+        </div>
+        <div class="stat-metric">
+            <span class="stat-label">Подтверждение через SQL <code>COUNT(*)</code>:</span>
+            <strong class="stat-value">{{ total_appointments }} записей</strong>
+        </div>
+    </div>
+
+    <div class="quick-nav-cards">
+        <article class="nav-card">
+            <h2>Медицинские кабинеты</h2>
+            <p>Просмотр номерного фонда, вместимости и специализации кабинетов клиники.</p>
+            <a href="{% url 'cabinets:cabinet_list' %}" class="btn btn-primary">Перейти к кабинетам</a>
+        </article>
+
+        <article class="nav-card">
+            <h2>Список приёмов</h2>
+            <p>Расписание приёмов с фильтрацией по числу пациентов, сортировкой и переходом к карточке приёма.</p>
+            <a href="{% url 'appointments:appointment_list' %}" class="btn btn-primary">Открыть список приёмов</a>
+        </article>
+
+        <article class="nav-card">
+            <h2>Статистика приёмов</h2>
+            <p>Аналитические выборки SQL с группировкой по типам приёмов (<code>COUNT</code>, <code>GROUP BY</code>, <code>HAVING</code>).</p>
+            <a href="{% url 'appointments:statistics' %}" class="btn btn-secondary">Посмотреть статистику</a>
+        </article>
+    </div>
+</section>
+{% endblock %}

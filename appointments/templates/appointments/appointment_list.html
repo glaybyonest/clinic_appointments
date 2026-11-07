@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Список приёмов — Клиника «МедЛайн»{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h1 class="page-title">Расписание приёмов</h1>
+        <p class="section-subtitle">
+            Найдено записей: <strong>{{ appointments|length }}</strong>
+            {% if min_patients_applied is not None %}
+                (применён фильтр: минимум {{ min_patients_applied }} пациентов)
+            {% endif %}
+        </p>
+    </div>
+
+    {% if filter_warning %}
+        <div class="alert alert-warning">{{ filter_warning }}</div>
+    {% endif %}
+
+    <form method="get" action="{% url 'appointments:appointment_list' %}" class="filter-form" id="appointment-filter-form">
+        <div class="form-group">
+            <label for="patients-input">Мин. количество пациентов:</label>
+            <input
+                type="number"
+                id="patients-input"
+                name="patients"
+                min="0"
+                placeholder="Например: 5"
+                value="{{ current_patients }}"
+                class="form-control"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="sort-select">Сортировка (ORDER BY):</label>
+            <select id="sort-select" name="sort" class="form-control">
+                {% for option in sort_choices %}
+                    <option value="{{ option.key }}" {% if current_sort == option.key %}selected{% endif %}>
+                        {{ option.label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="limit-select">Ограничение (LIMIT):</label>
+            <select id="limit-select" name="limit" class="form-control">
+                <option value="">Без ограничения</option>
+                {% for lim in limit_choices %}
+                    <option value="{{ lim }}" {% if current_limit == lim %}selected{% endif %}>
+                        Не более {{ lim }} записей
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Применить</button>
+            <a href="{% url 'appointments:appointment_list' %}" class="btn btn-secondary" id="reset-filter-link">Сбросить</a>
+        </div>
+    </form>
+
+    <div class="quick-filter-bar">
+        <span>Быстрая проверка фильтрации:</span>
+        <a href="{% url 'appointments:appointment_list' %}?patients=5" class="chip-link">?patients=5</a>
+        <a href="{% url 'appointments:appointment_list' %}?patients=10" class="chip-link">?patients=10</a>
+        <a href="{% url 'appointments:appointment_list' %}?patients=100" class="chip-link">?patients=100 (пустой результат)</a>
+        <a href="{% url 'appointments:appointment_list' %}?sort=patients_desc&limit=5" class="chip-link">TOP-5 по пациентам</a>
+    </div>
+
+    <div class="appointments-grid" id="appointments-container">
+        {% for appointment in appointments %}
+            {% include 'appointments/includes/appointment_card.html' with appointment=appointment %}
+        {% empty %}
+            <div class="empty-state">
+                <h2>По вашему запросу приёмы не найдены</h2>
+                {% if min_patients_applied is not None %}
+                    <p>Не найдено ни одного приёма, где количество записавшихся пациентов составляет <strong>{{ min_patients_applied }}</strong> или более.</p>
+                {% else %}
+                    <p>В базе данных в настоящий момент отсутствуют записи о приёмах.</p>
+                {% endif %}
+                <a href="{% url 'appointments:appointment_list' %}" class="btn btn-primary">Показать все приёмы</a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

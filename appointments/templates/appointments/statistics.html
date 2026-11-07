@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика приёмов — Клиника «МедЛайн»{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h1 class="page-title">Статистика приёмов по направлениям</h1>
+        <p class="section-subtitle">
+            Агрегированные данные SQLite с использованием <code>COUNT(*)</code>, <code>GROUP BY visit_type</code> и отбора групп <code>HAVING COUNT(*) &gt;= {{ min_count }}</code>.
+        </p>
+    </div>
+
+    <form method="get" action="{% url 'appointments:statistics' %}" class="filter-form stats-filter-form">
+        <div class="form-group">
+            <label for="min-count-input">Минимальное число приёмов в группе (<code>HAVING COUNT(*) &gt;=</code>):</label>
+            <input
+                type="number"
+                id="min-count-input"
+                name="min_count"
+                min="1"
+                max="20"
+                value="{{ min_count }}"
+                class="form-control"
+            >
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Обновить расчёт</button>
+            <a href="{% url 'appointments:statistics' %}?min_count=2" class="btn btn-secondary">Порог ≥ 2</a>
+            <a href="{% url 'appointments:statistics' %}?min_count=4" class="btn btn-secondary">Порог ≥ 4</a>
+        </div>
+    </form>
+
+    <div class="stats-table-wrapper">
+        <h2>Группировка по видам приёмов (результат SQL-запроса с <code>HAVING</code>)</h2>
+        {% if stats_by_type %}
+            <table class="data-table stats-table">
+                <thead>
+                    <tr>
+                        <th>Вид приёма (<code>visit_type</code>)</th>
+                        <th>Количество приёмов (<code>COUNT</code>)</th>
+                        <th>Всего записано пациентов (<code>SUM</code>)</th>
+                        <th>Средняя длительность, мин (<code>AVG</code>)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in stats_by_type %}
+                        <tr>
+                            <td><strong>{{ row.visit_type|upper }}</strong></td>
+                            <td>{{ row.appointment_count }}</td>
+                            <td>{{ row.total_patients }} чел.</td>
+                            <td>{{ row.avg_duration }} мин.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <h3>Нет групп, удовлетворяющих условию HAVING</h3>
+                <p>Ни один вид приёма не содержит {{ min_count }} или более записей. Попробуйте уменьшить порог отбора.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="stats-table-wrapper">
+        <h2>Распределение приёмов по текущему статусу</h2>
+        {% if status_summary %}
+            <table class="data-table stats-table">
+                <thead>
+                    <tr>
+                        <th>Статус приёма</th>
+                        <th>Интерпретация в шаблоне</th>
+                        <th>Количество записей (<code>COUNT</code>)</th>
+                        <th>Суммарно пациентов</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in status_summary %}
+                        <tr>
+                            <td><code>{{ item.status }}</code></td>
+                            <td>
+                                {% if item.status == 'запланирован' %}
+                                    <span class="status-badge status-planned">Запись открыта</span>
+                                {% elif item.status == 'идёт' %}
+                                    <span class="status-badge status-active">Приём идёт</span>
+                                {% elif item.status == 'завершён' %}
+                                    <span class="status-badge status-completed">Приём окончен</span>
+                                {% else %}
+                                    {{ item.status }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.status_count }}</td>
+                            <td>{{ item.status_patients }} чел.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

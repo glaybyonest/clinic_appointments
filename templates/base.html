@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Расписание приёмов{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{% url 'homepage:home' %}" class="brand-link">
+                <img src="{% static 'img/logo.png' %}" alt="Логотип клиники МедЛайн" class="brand-logo">
+                <div class="brand-text">
+                    <span class="brand-title">Клиника</span>
+                    <span class="brand-subtitle">«Расписание приёмов»</span>
+                </div>
+            </a>
+            <nav class="main-nav" aria-label="Основная навигация">
+                <ul class="nav-list">
+                    <li><a href="{% url 'homepage:home' %}" class="nav-link">Главная</a></li>
+                    <li><a href="{% url 'cabinets:cabinet_list' %}" class="nav-link">Кабинеты</a></li>
+                    <li><a href="{% url 'appointments:appointment_list' %}" class="nav-link">Список приёмов</a></li>
+                    <li><a href="{% url 'appointments:statistics' %}" class="nav-link">Статистика</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main container">
+        {% if db_error %}
+            <div class="alert alert-error" role="alert">
+                <strong>Ошибка доступа к данным:</strong> {{ db_error }}
+                <p class="alert-hint">Пожалуйста, попробуйте обновить страницу позже или обратитесь к администратору системы.</p>
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

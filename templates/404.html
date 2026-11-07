@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Страница не найдена (404) — Расписание приёмов{% endblock %}
+
+{% block content %}
+<section class="empty-state error-404-box">
+    <h1>Ошибка 404 — Приём или страница не найдены</h1>
+    <p>Запрошенный адрес не существует в расписании клиники. Возможно, ссылка устарела или в адресе допущена опечатка.</p>
+    <div class="action-links">
+        <a href="{% url 'appointments:appointment_list' %}" class="btn btn-primary">Перейти к списку приёмов</a>
+        <a href="{% url 'homepage:home' %}" class="btn btn-secondary">Вернуться на главную</a>
+    </div>
+</section>
+{% endblock %}

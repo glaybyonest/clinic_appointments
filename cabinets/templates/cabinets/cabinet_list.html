@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Список кабинетов — Клиника «МедЛайн»{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-header">
+        <h1 class="page-title">Кабинеты клиники</h1>
+        <p class="section-subtitle">Актуальные сведения из таблицы <code>cabinets</code> базы данных SQLite (всего кабинетов: {{ cabinets|length }}).</p>
+    </div>
+
+    <div class="cabinet-grid">
+        {% for cabinet in cabinets %}
+            <article class="cabinet-card">
+                <div class="cabinet-header">
+                    <h2 class="cabinet-title">{{ cabinet.name }}</h2>
+                    <span class="badge badge-type">{{ cabinet.cabin_type|upper }}</span>
+                </div>
+                <ul class="cabinet-details">
+                    <li><strong>Вместимость:</strong> {{ cabinet.capacity }} мест</li>
+                    <li><strong>Тип кабинета:</strong> {{ cabinet.cabin_type }}</li>
+                </ul>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <h2>Кабинеты отсутствуют</h2>
+                <p>В базе данных пока не зарегистрировано ни одного медицинского кабинета.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

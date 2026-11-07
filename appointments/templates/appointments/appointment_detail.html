@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if appointment %}{{ appointment.title }} — Приём{% else %}Ошибка получения данных{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if appointment %}
+<article class="detail-card">
+    <div class="detail-header">
+        <span class="badge badge-visit-type">{{ appointment.visit_type|upper }}</span>
+
+        {% if appointment.status == 'запланирован' %}
+            <span class="status-badge status-planned">Запись открыта ({{ appointment.status }})</span>
+        {% elif appointment.status == 'идёт' %}
+            <span class="status-badge status-active">Приём идёт ({{ appointment.status }})</span>
+        {% elif appointment.status == 'завершён' %}
+            <span class="status-badge status-completed">Приём окончен ({{ appointment.status }})</span>
+        {% else %}
+            <span class="status-badge">{{ appointment.status }}</span>
+        {% endif %}
+    </div>
+
+    <h1 class="page-title">{{ appointment.title }}</h1>
+    <p class="slug-caption">Символьный адрес (slug): <code>{{ appointment.slug }}</code></p>
+
+    <div class="detail-columns">
+        <section class="detail-panel">
+            <h2>Основные сведения о приёме</h2>
+            <table class="data-table">
+                <tbody>
+                    <tr>
+                        <th>Название услуги</th>
+                        <td>{{ appointment.title }}</td>
+                    </tr>
+                    <tr>
+                        <th>Вид приёма</th>
+                        <td>{{ appointment.visit_type|upper }}</td>
+                    </tr>
+                    <tr>
+                        <th>Дата приёма</th>
+                        <td>{{ appointment.visit_date|date:"d.m.Y" }} (время: {{ appointment.visit_date|date:"H:i" }})</td>
+                    </tr>
+                    <tr>
+                        <th>Продолжительность</th>
+                        <td>{{ appointment.duration }} минут</td>
+                    </tr>
+                    <tr>
+                        <th>Количество пациентов</th>
+                        <td>{{ appointment.patients }} чел.</td>
+                    </tr>
+                    <tr>
+                        <th>Статус приёма</th>
+                        <td>
+                            {% if appointment.status == 'запланирован' %}
+                                Запись открыта ({{ appointment.status }})
+                            {% elif appointment.status == 'идёт' %}
+                                Приём идёт ({{ appointment.status }})
+                            {% elif appointment.status == 'завершён' %}
+                                Приём окончен ({{ appointment.status }})
+                            {% else %}
+                                {{ appointment.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="detail-panel">
+            <h2>Сведения о медицинском кабинете</h2>
+            <table class="data-table">
+                <tbody>
+                    <tr>
+                        <th>Название кабинета</th>
+                        <td>{{ appointment.cabin_name|default:"Кабинет не указан" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Вместимость кабинета</th>
+                        <td>
+                            {% if appointment.cabin_capacity %}
+                                {{ appointment.cabin_capacity }} мест
+                            {% else %}
+                                Не указана
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Тип кабинета</th>
+                        <td>{{ appointment.cabin_type|default:"Кабинет не указан" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <div class="detail-footer">
+        <a href="{% url 'appointments:appointment_list' %}" class="btn btn-primary">← Вернуться к списку приёмов</a>
+        <a href="{% url 'cabinets:cabinet_list' %}" class="btn btn-secondary">Все кабинеты клиники</a>
+    </div>
+</article>
+{% endif %}
+{% endblock %}
